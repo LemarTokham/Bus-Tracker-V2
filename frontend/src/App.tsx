@@ -13,6 +13,10 @@ import {
   import type {MapCameraChangedEvent} from '@vis.gl/react-google-maps'
   import { Circle } from './components/circle';
 
+
+
+  // API key
+  const api_key = import.meta.env.VITE_API_KEY
 type Poi = {key: string, location: google.maps.LatLngLiteral }
 const locations: Poi[] = [
   {key: 'operaHouse', location: { lat: -33.8567844, lng: 151.213108  }},
@@ -35,7 +39,7 @@ const locations: Poi[] = [
 
 function App() {
   return (
-    <APIProvider apiKey={'AIzaSyAo3ZTU1EGproyrlCct0djJYoXmeZveQy8' }>
+    <APIProvider apiKey={api_key}>
       <Map
       onCameraChanged={(ev: MapCameraChangedEvent)=> console.log(ev.detail.zoom)}
        style={{width: '100vw', height: '100vh'}}
