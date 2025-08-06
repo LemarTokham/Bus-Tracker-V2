@@ -1,4 +1,4 @@
-// import './App.css'
+import './App.css'
 import {useEffect, useState, useRef, useCallback} from 'react';
 import {createRoot} from "react-dom/client";
 import {
@@ -39,10 +39,11 @@ const locations: Poi[] = [
 
 function App() {
   return (
+
     <APIProvider apiKey={api_key}>
       <Map
       onCameraChanged={(ev: MapCameraChangedEvent)=> console.log(ev.detail.zoom)}
-       style={{width: '100vw', height: '100vh'}}
+       style={{width: 800, height: 800} }
       defaultCenter={{ lat: -33.860664, lng: 151.208138 }}
       defaultZoom={13}
       mapId={'bdf9633d0aa1b62af7a1a582'}
@@ -88,7 +89,6 @@ const PoiMarkers = (props: { pois: Poi[] }) => {
     });
   };
 
-
   const handleClick = useCallback((ev: google.maps.MapMouseEvent) => {
     if (!map) return;
     if (!ev.latLng) return;
@@ -118,7 +118,7 @@ const PoiMarkers = (props: { pois: Poi[] }) => {
           position={poi.location}
           ref={marker => setMarkerRef(marker, poi.key)}
           >
-            <Pin background={'#FBBC04'} glyphColor={'#000'} borderColor={'#000'} />
+            <Pin background={'#FF0000'} glyphColor={'#000'} borderColor={'#000'} />
         </AdvancedMarker>
       ))}
     </>
