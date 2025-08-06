@@ -9,7 +9,7 @@ bus_stops = [
     {'name': 'Brownlow Hill',
      'id':'merdjapg',
      'Buses':[76, 201, 699],
-     'Location': [-2.9618, 53.4055] # Long and Lat
+     'Location': [-2.9618, 53.4055] # [Long, Lat]
      },
      {'name': 'Crown Street',
      'id':'merdjapd',
@@ -24,6 +24,12 @@ def home():
         "message": "FLask is running",
         "timestamp": datetime.now().isoformat(),
         "version": "1.0.0"
+    })
+
+@app.route('/api/bus-stops', methods=['GET'])
+def get_bus_stops():
+    return jsonify({
+        "bus_stops":bus_stops
     })
 
 
