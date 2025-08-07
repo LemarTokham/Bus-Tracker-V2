@@ -8,13 +8,13 @@ CORS(app)
 bus_stops = [
     {'name': 'Brownlow Hill',
      'id':'merdjapg',
-     'Buses':[76, 201, 699],
-     'Location': [-2.9618, 53.4055] # [Long, Lat]
+     'buses':[76, 201, 699],
+     'location': {'lat': 53.4055, 'lng': -2.9618 } # [Lat, Long]
      },
      {'name': 'Crown Street',
      'id':'merdjapd',
-     'Buses':[201, 6, 7, 79],
-     'Location': [-2.96366, 53.4061]
+     'buses':[201, 6, 7, 79],
+     'location': {'lat': 53.4061, 'lng': -2.96366 }
      }
 ]
 
