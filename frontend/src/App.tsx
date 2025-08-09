@@ -39,7 +39,6 @@ function App() {
 
 
   const handleClick = ( async ()=>{
-    console.log("hi")
     const result = await getBusStopData()
     setBusStops(result)
   })
@@ -73,7 +72,6 @@ function App() {
     }
   })
 
-
   return (
     <div>
         <button onClick={async () => handleClick()}>
@@ -105,6 +103,5 @@ function App() {
     </div>
   )
 }
-
 
 export default App

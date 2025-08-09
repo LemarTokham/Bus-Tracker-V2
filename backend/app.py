@@ -32,17 +32,19 @@ bus_stops = [
 # Methods for each bus provider:
 # Download the XML, parse through it for all relevant bus, send data off to API, repeat every 10 seconds
 
-# api_url = f"https://data.bus-data.dft.gov.uk/api/v1/datafeed/709/?api_key={api_key}"
-# response = requests.get(api_url)
-# with open("bus_data.txt", "w") as f:
-#     res = response.json()
-#     f.write(res)
+api_url = f"https://data.bus-data.dft.gov.uk/api/v1/datafeed/709/?api_key={api_key}"
+response = requests.get(api_url)
+print(response)
+with open("arriva_liverpool.txt", "w") as f:
+    f.write(response.text)
 
-# bus_info = [
-#     {
+
+
+bus_info = [
+    {
         
-#     }
-# ]
+    }
+]
 
 
 # Test if app is working
