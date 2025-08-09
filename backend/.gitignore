@@ -1,1 +1,4 @@
 *.env
+
+# Large text file for bus location
+stagecoach_liverpool.txt

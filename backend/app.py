@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 import json
 
+
 ## SETUP
 # Load api key
 load_dotenv()
@@ -44,6 +45,9 @@ with open("stagecoach_liverpool.txt", "w") as f:
 
 
 # Read bus XML file to get location data
+# XML structure example:
+# Siri -> ServiceDelivery -> VehicleMonitoringDelivery -> VehicleActivity (Where the data about individual buses live)
+
 bus_info = [
     {
         
