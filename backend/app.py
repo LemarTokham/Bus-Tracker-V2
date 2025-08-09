@@ -5,7 +5,7 @@ import requests
 import os
 from dotenv import load_dotenv
 import json
-
+import xml.etree.ElementTree as ET
 
 ## SETUP
 # Load api key
@@ -39,20 +39,22 @@ bus_stops = [
 # Download the XML, parse through it for all relevant bus, send data off to API, repeat every 10 seconds
 api_url = f"https://data.bus-data.dft.gov.uk/api/v1/datafeed/1695/?api_key={api_key}"
 response = requests.get(api_url)
-print(response)
-with open("stagecoach_liverpool.txt", "w") as f:
+print(response.encoding)
+with open("stagecoach_liverpool.txt", "w", encoding='utf-8') as f:
     f.write(response.text)
 
 
 # Read bus XML file to get location data
 # XML structure example:
 # Siri -> ServiceDelivery -> VehicleMonitoringDelivery -> VehicleActivity (Where the data about individual buses live)
+tree = ET.parse('stagecoach_liverpool.txt')
+root = tree.getroot()
+print(root.tag)
+# for item in root.findall('.//LineRef'):
+#     print()
+# print(root)
 
-bus_info = [
-    {
-        
-    }
-]
+bus_info = []
 
 
 # Test if app is working
@@ -73,11 +75,29 @@ def get_bus_stops():
 
 @app.route('/api/buses', methods=['POST'])
 def send_bus_location():
-    data = request.json
-    print(f"Recived {data}")
+    bus_line = request.json
+    print(f"Recived {bus_line}")
+    tree = ET.parse('stagecoach_liverpool.txt')
+    ns = {'siri': "http://www.siri.org.uk/siri"}
+    root = tree.getroot()
+    allVehicles = root.findall('.//siri:VehicleActivity', ns)
+    for vehicle in allVehicles:
+        journey = vehicle.find('./siri:MonitoredVehicleJourney', ns)
+        if journey is not None: # Checking for a tracked journey
+            bus = journey.find('./siri:LineRef', ns)
+            if bus is not None and bus.text == bus_line: # Checking if a bus is being tracked
+                location = journey.find('./siri:VehicleLocation', ns)
+                if location is not None : # Checking if we have both longitude and latitude
+                    lat = location.find('./siri:Latitude', ns)
+                    long = location.find('./siri:Longitude', ns)
+                    bus_info.append({'lat':float(lat.text), 'long':float(long.text)})
 
+
+    print("hi", bus_info)
     return jsonify({
         "message": "Got the bus",
+        "buses":bus_info
+
     })
 
 
