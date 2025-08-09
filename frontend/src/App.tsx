@@ -31,17 +31,37 @@ function App() {
     location: google.maps.LatLngLiteral
     name: string;
     buses: [number]
-
   }
   
   const [busStops, setBusStops] = useState<BusStop[]>([])
+  const [stopClicked, setStopClicked] = useState<boolean>(false)
+  const [buses, setBuses] = useState<number[]>([])
+
+
+
+
+  const handleClick = ( async ()=>{
+    console.log("hi")
+    const result = await getBusStopData()
+    setBusStops(result)
+  })
+
+  const handleStopClick = ((busList: number[])=>{
+    console.log(busList)
+    setBuses(busList)
+    setStopClicked(true)
+  })
+
 
   return (
     <div>
-        <button onClick={async () => {
-      const result = await getBusStopData()
-      setBusStops(result)
-    }}>Show bus stops</button>
+        <button onClick={async () => handleClick()}>
+        Show bus stops</button>
+    {stopClicked && <p>Buses that stop here: {buses.map((bus, index) => { return (
+      <span className='bus-name' onMouseOver={()=> {
+      }} onClick={() => console.log(bus)} key={index}>"{bus}" </span>)
+    })} </p>}
+    
     <APIProvider apiKey={api_key}>
       <Map
        style={{width: 800, height: 800} }
@@ -52,7 +72,7 @@ function App() {
       >
       {busStops.map((stop)=>(
         <AdvancedMarker
-        onClick={() => console.log(stop.buses)}
+        onClick={() => handleStopClick(stop.buses)}
         key={stop.name}
         position={stop.location}
         >
@@ -65,10 +85,6 @@ function App() {
     </div>
   )
 }
-
-
-
-
 
 
 export default App
