@@ -4,6 +4,7 @@ from datetime import datetime
 import requests
 import os
 from dotenv import load_dotenv
+import json
 
 ## SETUP
 # Load api key
@@ -58,6 +59,15 @@ def home():
 def get_bus_stops():
     return jsonify({
         "bus_stops":bus_stops
+    })
+
+@app.route('/api/buses', methods=['POST'])
+def send_bus_location():
+    data = request.json
+    print(f"Recived {data}")
+
+    return jsonify({
+        "message": "Got the bus",
     })
 
 

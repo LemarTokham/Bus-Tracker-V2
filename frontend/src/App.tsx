@@ -38,18 +38,39 @@ function App() {
   const [buses, setBuses] = useState<number[]>([])
 
 
-
-
   const handleClick = ( async ()=>{
     console.log("hi")
     const result = await getBusStopData()
     setBusStops(result)
   })
 
+
   const handleStopClick = ((busList: number[])=>{
     console.log(busList)
     setBuses(busList)
     setStopClicked(true)
+  })
+
+
+  const handleBusClick = ( async (bus:number)=> {
+    console.log(bus)
+    const url = 'http://127.0.0.1:5000/api/buses'
+    try{
+      const response = await fetch(url, {
+      method:'POST',
+      body: JSON.stringify(bus),
+      headers: {
+        "Content-Type":"application/json"
+      }
+    })
+    if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+      }
+      const data = await response.json()
+      console.log(data)
+    } catch (error) {
+      console.log(error)
+    }
   })
 
 
@@ -59,7 +80,7 @@ function App() {
         Show bus stops</button>
     {stopClicked && <p>Buses that stop here: {buses.map((bus, index) => { return (
       <span className='bus-name' onMouseOver={()=> {
-      }} onClick={() => console.log(bus)} key={index}>"{bus}" </span>)
+      }} onClick={() => handleBusClick(bus)} key={index}>"{bus}" </span>)
     })} </p>}
     
     <APIProvider apiKey={api_key}>
@@ -81,7 +102,6 @@ function App() {
       ))}
       </Map>
     </APIProvider>
-
     </div>
   )
 }
