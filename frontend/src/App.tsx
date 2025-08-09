@@ -30,12 +30,12 @@ function App() {
   interface BusStop {
     location: google.maps.LatLngLiteral
     name: string;
-    buses: [number]
+    buses: [string]
   }
   
   const [busStops, setBusStops] = useState<BusStop[]>([])
   const [stopClicked, setStopClicked] = useState<boolean>(false)
-  const [buses, setBuses] = useState<number[]>([])
+  const [buses, setBuses] = useState<string[]>([])
 
 
   const handleClick = ( async ()=>{
@@ -44,14 +44,14 @@ function App() {
   })
 
 
-  const handleStopClick = ((busList: number[])=>{
+  const handleStopClick = ((busList: string[])=>{
     console.log(busList)
     setBuses(busList)
     setStopClicked(true)
   })
 
 
-  const handleBusClick = ( async (bus:number)=> {
+  const handleBusClick = ( async (bus:string)=> {
     console.log(bus)
     const url = 'http://127.0.0.1:5000/api/buses'
     try{

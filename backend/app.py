@@ -19,27 +19,31 @@ CORS(app)
 bus_stops = [
     {'name': 'Brownlow Hill',
      'id':'merdjapg',
-     'buses':[76, 201, 699],
+     'buses':["76", "201", "699"],
      'location': {'lat': 53.40575, 'lng': -2.9618 } # [Lat, Long]
      },
      {'name': 'Crown Street',
      'id':'merdjapd',
-     'buses':[201, 6, 7, 79],
+     'buses':["201", "6", "7", "79"],
      'location': {'lat': 53.40611, 'lng': -2.96367 }
+     },
+    {'name': 'Shaw Street',
+     'id':'merdgwtp', # TODO: put in indicator field to distinguish between buses on same street
+     'buses':["14", "14A", "14B", "14X", "17", "17A", "17X", "19"], # TODO: Differentiate between arriva and stagecoach buses
+     'location': {'lat': 53.41204, 'lng': -2.96723}
      }
 ]
 
 # Methods for each bus provider:
 # Download the XML, parse through it for all relevant bus, send data off to API, repeat every 10 seconds
-
-api_url = f"https://data.bus-data.dft.gov.uk/api/v1/datafeed/709/?api_key={api_key}"
+api_url = f"https://data.bus-data.dft.gov.uk/api/v1/datafeed/1695/?api_key={api_key}"
 response = requests.get(api_url)
 print(response)
-with open("arriva_liverpool.txt", "w") as f:
+with open("stagecoach_liverpool.txt", "w") as f:
     f.write(response.text)
 
 
-
+# Read bus XML file to get location data
 bus_info = [
     {
         
