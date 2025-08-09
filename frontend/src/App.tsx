@@ -8,6 +8,19 @@ import { useState } from 'react';
 // API key
 const api_key = import.meta.env.VITE_API_KEY
 
+
+interface BusStop {
+  location: google.maps.LatLngLiteral
+  name: string;
+  buses: string[]
+}
+
+interface BusLocation {
+  lat: number,
+  lng: number
+}
+  
+
 // Fetch bus stop information
 async function getBusStopData(){
   const url = 'http://127.0.0.1:5000/api/bus-stops'
@@ -26,16 +39,12 @@ async function getBusStopData(){
   }
 }
 
+
 function App() {
-  interface BusStop {
-    location: google.maps.LatLngLiteral
-    name: string;
-    buses: [string]
-  }
-  
   const [busStops, setBusStops] = useState<BusStop[]>([])
   const [stopClicked, setStopClicked] = useState<boolean>(false)
   const [buses, setBuses] = useState<string[]>([])
+  const [busLocation, setBusLocation] = useState<BusLocation[]>([])
 
 
   const handleClick = ( async ()=>{
@@ -66,19 +75,25 @@ function App() {
         throw new Error(`Response status: ${response.status}`);
       }
       const data = await response.json()
-      console.log(data)
+      setBusLocation(data.buses)
     } catch (error) {
       console.log(error)
     }
   })
 
+
   return (
     <div>
-        <button onClick={async () => handleClick()}>
-        Show bus stops</button>
+      <button onClick={handleClick}>
+        Show bus stops
+      </button>
+
     {stopClicked && <p>Buses that stop here: {buses.map((bus, index) => { return (
-      <span className='bus-name' onMouseOver={()=> {
-      }} onClick={() => handleBusClick(bus)} key={index}>"{bus}" </span>)
+      <span className='bus-name' 
+      style={{cursor:'pointer'}}
+      onClick={() => handleBusClick(bus)} 
+      key={index}>"{bus}" 
+      </span>)
     })} </p>}
     
     <APIProvider apiKey={api_key}>
@@ -98,6 +113,17 @@ function App() {
           <Pin background={'#FBBC04'} glyphColor={'#000'} borderColor={'#000'} />
         </AdvancedMarker>
       ))}
+
+      {busLocation.length > 0 && (
+        busLocation.map((bus,index) => (
+          <AdvancedMarker
+          key={index}
+          position={bus}
+          >
+            <Pin background={'#FF0000'} glyphColor={'#000'} borderColor={'#000'} />
+          </AdvancedMarker>
+        ))
+      )}
       </Map>
     </APIProvider>
     </div>

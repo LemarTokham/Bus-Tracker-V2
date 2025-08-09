@@ -75,6 +75,7 @@ def get_bus_stops():
 
 @app.route('/api/buses', methods=['POST'])
 def send_bus_location():
+    bus_info = [] # Reset object on every call
     bus_line = request.json
     print(f"Recived {bus_line}")
     tree = ET.parse('stagecoach_liverpool.txt')
@@ -90,14 +91,11 @@ def send_bus_location():
                 if location is not None : # Checking if we have both longitude and latitude
                     lat = location.find('./siri:Latitude', ns)
                     long = location.find('./siri:Longitude', ns)
-                    bus_info.append({'lat':float(lat.text), 'long':float(long.text)})
+                    bus_info.append({'lat':float(lat.text), 'lng':float(long.text)})
 
-
-    print("hi", bus_info)
     return jsonify({
         "message": "Got the bus",
         "buses":bus_info
-
     })
 
 
