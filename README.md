@@ -4,15 +4,15 @@ Building an improved bus tracker this time using react/ts and the google maps ap
 # Current Features
 - Currently displays a select number of bus stops.
 - Each stop can be clicked on, showing the buses from the selected stop.
-- Each bus can be clicked on, with the goal being location data about that bus sent back from the server. Right now the server just sends back a generic message.
+- Each bus can be clicked on, once clicked, the location of each bus of that line is displayed on the map
 
 # Features in progress
-- Sending back bus location to be displayed in the frontend.
-- Having the bus stops show directly on load, right now they only show after the "Show bus stops" button is clicked.
+- Having the bus locations be updated every 10 seconds (which is the same time as which the actual Gov.UK api updates)
+- Letting the user know which of the bus options have no buses out on the roads
 
 # Image of UI + console
-![UI image](images/ui-console-image.png)
+![UI image](images/bus-location-image.png)
 
 # Current blockers
-- Trying to understand the location data im getting from Gov.UK as sometimes buses seem to be randomly missing from the dataset provided
+- N/A
 
