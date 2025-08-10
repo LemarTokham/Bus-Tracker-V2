@@ -9,8 +9,10 @@ Building an improved bus tracker this time using react/ts and the google maps ap
 # Features in progress
 - Having the bus locations be updated every 10 seconds (which is the same time as which the actual Gov.UK api updates)
 - Letting the user know which of the bus options have no buses out on the roads
-
+- Legend for icons
 # Image of UI + console
+- yellow pins are the bus stops
+- Red pins are the busses from selected bus (the "17" highlighted in blue)
 ![UI image](images/bus-location-image.png)
 
 # Current blockers
