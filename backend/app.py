@@ -6,8 +6,8 @@ import os
 from dotenv import load_dotenv
 import json
 import xml.etree.ElementTree as ET
+import threading
 
-## SETUP
 # Load api key
 load_dotenv()
 api_key = os.getenv('API_KEY')
@@ -16,7 +16,7 @@ api_key = os.getenv('API_KEY')
 app = Flask(__name__)
 CORS(app)
 
-## APP
+
 bus_stops = [
     {'name': 'Brownlow Hill',
      'id':'merdjapg',
@@ -35,26 +35,18 @@ bus_stops = [
      }
 ]
 
-# Methods for each bus provider:
+
 # Download the XML, parse through it for all relevant bus, send data off to API, repeat every 10 seconds
-api_url = f"https://data.bus-data.dft.gov.uk/api/v1/datafeed/1695/?api_key={api_key}"
-response = requests.get(api_url)
-print(response.encoding)
-with open("stagecoach_liverpool.txt", "w", encoding='utf-8') as f:
-    f.write(response.text)
+def fetch_data():
+    api_url = f"https://data.bus-data.dft.gov.uk/api/v1/datafeed/1695/?api_key={api_key}"
+    response = requests.get(api_url)
+    print(response.encoding)
+    with open("stagecoach_liverpool.txt", "w", encoding='utf-8') as f:
+        f.write(response.text) 
 
+    threading.Timer(10, fetch_data).start() # Start a new thread where this function will be ran every 10 seconds
 
-# Read bus XML file to get location data
-# XML structure example:
-# Siri -> ServiceDelivery -> VehicleMonitoringDelivery -> VehicleActivity (Where the data about individual buses live)
-tree = ET.parse('stagecoach_liverpool.txt')
-root = tree.getroot()
-print(root.tag)
-# for item in root.findall('.//LineRef'):
-#     print()
-# print(root)
-
-bus_info = []
+fetch_data() # Start first function cal
 
 
 # Test if app is working
@@ -66,6 +58,7 @@ def home():
         "version": "1.0.0"
     })
 
+
 # Fetch Bus stops info
 @app.route('/api/bus-stops', methods=['GET'])
 def get_bus_stops():
@@ -73,11 +66,14 @@ def get_bus_stops():
         "bus_stops":bus_stops
     })
 
+
 @app.route('/api/buses', methods=['POST'])
 def send_bus_location():
-    bus_info = [] # Reset object on every call
+    bus_info = []
     bus_line = request.json
     print(f"Recived {bus_line}")
+    # XML structure example:
+    # Siri -> ServiceDelivery -> VehicleMonitoringDelivery -> VehicleActivity (Where the data about individual buses live)
     tree = ET.parse('stagecoach_liverpool.txt')
     ns = {'siri': "http://www.siri.org.uk/siri"}
     root = tree.getroot()
@@ -101,4 +97,4 @@ def send_bus_location():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)

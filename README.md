@@ -18,3 +18,4 @@ Building an improved bus tracker this time using react/ts and the google maps ap
 # Current blockers
 - Trying to find a way to keep making API calls every 10 seconds to update location data.
 - Learning about websockets so the backend data can continuously send fresh data to the frontend.
+
