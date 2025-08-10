@@ -11,7 +11,7 @@ Building an improved bus tracker this time using react/ts and the google maps ap
 - Letting the user know which of the bus options have no buses out on the roads
 - Legend for icons
 # Image of UI + console
-- yellow pins are the bus stops
+- Yellow pins are the bus stops
 - Red pins are the busses from selected bus (the "17" highlighted in blue)
 ![UI image](images/bus-location-image.png)
 
