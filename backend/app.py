@@ -109,6 +109,5 @@ def handle_message(msg):
     send(f'Echo: {msg}') # Send it back to client
 
 
-
 if __name__ == '__main__':
     socketio.run(app)
