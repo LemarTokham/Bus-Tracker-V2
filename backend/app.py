@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 import json
 import xml.etree.ElementTree as ET
 import threading
+from flask_socketio import SocketIO, send, emit, join_room, leave_room
 
 # Load api key
 load_dotenv()
@@ -15,6 +16,8 @@ api_key = os.getenv('API_KEY')
 # Define app
 app = Flask(__name__)
 CORS(app)
+socketio = SocketIO(app,cors_allowed_origins="*")
+
 
 
 bus_stops = [
@@ -95,6 +98,17 @@ def send_bus_location():
     })
 
 
+# Web Socket events
+@socketio.on('connect')
+def handle_connect():
+    print('Client connected')
+
+@socketio.on('message')
+def handle_message(msg):
+    print(f'Recieved message: {msg}')
+    send(f'Echo: {msg}') # Send it back to client
+
+
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    socketio.run(app)

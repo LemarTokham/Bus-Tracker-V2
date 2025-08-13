@@ -3,7 +3,8 @@ import {
     APIProvider,
     Map,} from '@vis.gl/react-google-maps';
 import { AdvancedMarker, Pin } from '@vis.gl/react-google-maps';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { io, Socket } from 'socket.io-client'
 
 // API key
 const api_key = import.meta.env.VITE_API_KEY
@@ -39,13 +40,38 @@ async function getBusStopData(){
   }
 }
 
-
+const SOCKET_URL = 'http://127.0.0.1:5000'
 function App() {
   const [busStops, setBusStops] = useState<BusStop[]>([])
   const [stopClicked, setStopClicked] = useState<boolean>(false)
   const [buses, setBuses] = useState<string[]>([])
   const [busLocation, setBusLocation] = useState<BusLocation[]>([])
 
+  
+  // Setting up WebSocket
+  
+  useEffect(()=> {
+    // Connection being created
+    const socket: Socket = io(SOCKET_URL)
+
+    // When connected
+    socket.on('connect', ()=>{
+      console.log('Connected to server!')
+    })
+
+    // Receiving data
+    socket.on('message', (data)=> {
+      console.log(data)
+    })
+
+    // Sending back information
+    socket.emit('message', 'hello from react!!!!!')
+
+    return ()=>{
+      socket.disconnect()
+    }
+  }, []) // inside a useEffect so it only happens when the component mounts
+  
 
   const handleClick = ( async ()=>{
     const result = await getBusStopData()
