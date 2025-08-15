@@ -49,10 +49,10 @@ function App() {
 
   
   // Setting up WebSocket
-  
+  const socket: Socket = io(SOCKET_URL)
   useEffect(()=> {
     // Connection being created
-    const socket: Socket = io(SOCKET_URL)
+    
 
     // When connected
     socket.on('connect', ()=>{
@@ -88,6 +88,7 @@ function App() {
 
   const handleBusClick = ( async (bus:string)=> {
     console.log(bus)
+    socket.emit('message', bus)
     const url = 'http://127.0.0.1:5000/api/buses'
     try{
       const response = await fetch(url, {
