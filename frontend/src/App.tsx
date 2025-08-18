@@ -39,20 +39,20 @@ async function getBusStopData(){
     return []
   }
 }
-
+// Who we are communicating with
 const SOCKET_URL = 'http://127.0.0.1:5000'
+
 function App() {
   const [busStops, setBusStops] = useState<BusStop[]>([])
   const [stopClicked, setStopClicked] = useState<boolean>(false)
   const [buses, setBuses] = useState<string[]>([])
   const [busLocation, setBusLocation] = useState<BusLocation[]>([])
 
-  
-  // Setting up WebSocket
-  const socket: Socket = io(SOCKET_URL)
+
   useEffect(()=> {
-    // Connection being created
-    
+      
+    // Setting up WebSocket
+    const socket: Socket = io(SOCKET_URL)
 
     // When connected
     socket.on('connect', ()=>{
@@ -66,6 +66,7 @@ function App() {
 
     // Sending back information
     socket.emit('message', 'hello from react!!!!!')
+    socket.emit('bus-line', 18)
 
     return ()=>{
       socket.disconnect()
@@ -88,7 +89,6 @@ function App() {
 
   const handleBusClick = ( async (bus:string)=> {
     console.log(bus)
-    socket.emit('message', bus)
     const url = 'http://127.0.0.1:5000/api/buses'
     try{
       const response = await fetch(url, {

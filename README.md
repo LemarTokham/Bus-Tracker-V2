@@ -16,5 +16,5 @@ Building an improved bus tracker this time using react/ts and the google maps ap
 ![UI image](images/bus-location-image.png)
 
 # Current blockers
-- Ive figured out how to use threads to keep polling API every 10 seconds for location data and i've got websockets set up between front and back end, just need to convert that to send bus data instead of random messages
+- Taking a small break as I've got my theory test coming up and trying to use WebSockets with react is proving harder than i'd imagine...I'll be back
 

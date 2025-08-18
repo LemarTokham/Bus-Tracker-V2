@@ -38,7 +38,7 @@ bus_stops = [
      }
 ]
 
-
+bus_info = []
 # Download the XML, parse through it for all relevant bus, send data off to API, repeat every 10 seconds
 def fetch_data():
     api_url = f"https://data.bus-data.dft.gov.uk/api/v1/datafeed/1695/?api_key={api_key}"
@@ -46,6 +46,24 @@ def fetch_data():
     print(response.encoding)
     with open("stagecoach_liverpool.txt", "w", encoding='utf-8') as f:
         f.write(response.text) 
+
+    # Parse through data and extract requested buses
+    tree = ET.parse('stagecoach_liverpool.txt')
+    ns = {'siri': "http://www.siri.org.uk/siri"}
+    root = tree.getroot()
+    allVehicles = root.findall('.//siri:VehicleActivity', ns)
+    # # Clear list before populating with new buses
+    # bus_info = []
+    # for vehicle in allVehicles:
+    #     journey = vehicle.find('./siri:MonitoredVehicleJourney', ns)
+    #     if journey is not None: # Checking for a tracked journey
+    #         bus = journey.find('./siri:LineRef', ns)
+    #         if bus is not None and bus.text == bus_line: # Checking if a bus is being tracked
+    #             location = journey.find('./siri:VehicleLocation', ns)
+    #             if location is not None : # Checking if we have both longitude and latitude
+    #                 lat = location.find('./siri:Latitude', ns)
+    #                 long = location.find('./siri:Longitude', ns)
+    #                 bus_info.append({'lat':float(lat.text), 'lng':float(long.text)})
 
     threading.Timer(10, fetch_data).start() # Start a new thread where this function will be ran every 10 seconds
 
@@ -72,25 +90,12 @@ def get_bus_stops():
 
 @app.route('/api/buses', methods=['POST'])
 def send_bus_location():
-    bus_info = []
+    
     bus_line = request.json
     print(f"Recived {bus_line}")
     # XML structure example:
     # Siri -> ServiceDelivery -> VehicleMonitoringDelivery -> VehicleActivity (Where the data about individual buses live)
-    tree = ET.parse('stagecoach_liverpool.txt')
-    ns = {'siri': "http://www.siri.org.uk/siri"}
-    root = tree.getroot()
-    allVehicles = root.findall('.//siri:VehicleActivity', ns)
-    for vehicle in allVehicles:
-        journey = vehicle.find('./siri:MonitoredVehicleJourney', ns)
-        if journey is not None: # Checking for a tracked journey
-            bus = journey.find('./siri:LineRef', ns)
-            if bus is not None and bus.text == bus_line: # Checking if a bus is being tracked
-                location = journey.find('./siri:VehicleLocation', ns)
-                if location is not None : # Checking if we have both longitude and latitude
-                    lat = location.find('./siri:Latitude', ns)
-                    long = location.find('./siri:Longitude', ns)
-                    bus_info.append({'lat':float(lat.text), 'lng':float(long.text)})
+    
 
     return jsonify({
         "message": "Got the bus",
@@ -107,6 +112,10 @@ def handle_connect():
 def handle_message(msg):
     print(f'Recieved message: {msg}')
     send(f'Echo: {msg}') # Send it back to client
+
+@socketio.on('bus-line')
+def handle_request(data):
+    print(data)
 
 
 if __name__ == '__main__':
