@@ -5,6 +5,7 @@ Building an improved bus tracker this time using react/ts and the google maps ap
 - Currently displays a select number of bus stops.
 - Each stop can be clicked on, showing the buses from the selected stop.
 - Each bus can be clicked on, once clicked, the location of each bus of that line is displayed on the map
+- Polling of API happens every 10 seconds to get new location data automatically
 
 # Features in progress
 - Having the bus locations be updated every 10 seconds (which is the same time as which the actual Gov.UK api updates)
@@ -16,5 +17,5 @@ Building an improved bus tracker this time using react/ts and the google maps ap
 ![UI image](images/bus-location-image.png)
 
 # Current blockers
-- Taking a small break as I've got my theory test coming up and trying to use WebSockets with react is proving harder than i'd imagine...I'll be back
+
 

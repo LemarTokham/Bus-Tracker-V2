@@ -6,18 +6,14 @@ import os
 from dotenv import load_dotenv
 import json
 import xml.etree.ElementTree as ET
-import threading
-from flask_socketio import SocketIO, send, emit, join_room, leave_room
+import time
 
-# Load api key
+
 load_dotenv()
 api_key = os.getenv('API_KEY')
 
-# Define app
 app = Flask(__name__)
 CORS(app)
-# socketio = SocketIO(app,cors_allowed_origins="*")
-
 
 
 bus_stops = [
@@ -39,22 +35,14 @@ bus_stops = [
 ]
 
 
-counter = 0
 bus_info = []
-# Download the XML, parse through it for all relevant bus, send data off to API, repeat every 10 seconds
-def fetch_data(line):
-    # Just seeing how many times we are calling this function
-    counter += 1
+def fetch_data():
     api_url = f"https://data.bus-data.dft.gov.uk/api/v1/datafeed/1695/?api_key={api_key}"
     response = requests.get(api_url)
-    print(response.encoding)
     with open("stagecoach_liverpool.txt", "w", encoding='utf-8') as f:
         f.write(response.text) 
 
-    
 
-
-# Test if app is working
 @app.route('/', methods=['GET'])
 def home():
     return jsonify({
@@ -64,7 +52,6 @@ def home():
     })
 
 
-# Fetch Bus stops info
 @app.route('/api/bus-stops', methods=['GET'])
 def get_bus_stops():
     return jsonify({
@@ -74,6 +61,7 @@ def get_bus_stops():
 
 @app.route('/api/buses', methods=['POST'])
 def send_bus_location():
+    fetch_data()
     bus_line = request.json
     # XML structure example:
     # Siri -> ServiceDelivery -> VehicleMonitoringDelivery -> VehicleActivity (Where the data about individual buses live)
@@ -90,33 +78,16 @@ def send_bus_location():
             bus = journey.find('./siri:LineRef', ns)
             if bus is not None and bus.text == bus_line: # Checking if a bus is being tracked
                 location = journey.find('./siri:VehicleLocation', ns)
-                if location is not None : # Checking if we have both longitude and latitude
+                if location is not None : # Checking if we have a location
                     lat = location.find('./siri:Latitude', ns)
                     long = location.find('./siri:Longitude', ns)
                     bus_info.append({'lat':float(lat.text), 'lng':float(long.text)})
     print(f"Recived {bus_line}")
-    print("hih", bus_info)
 
     return jsonify({
         "message": "Got the bus",
         "buses":bus_info,
-        "count":counter
     })
-
-
-# # Web Socket events
-# @socketio.on('connect')
-# def handle_connect():
-#     print('Client connected')
-
-# @socketio.on('message')
-# def handle_message(msg):
-#     print(f'Recieved message: {msg}')
-#     send(f'Echo: {msg}') # Send it back to client
-
-# @socketio.on('bus-line')
-# def handle_request(data):
-#     print(data)
 
 
 if __name__ == '__main__':

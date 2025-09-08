@@ -3,7 +3,7 @@ import {
     APIProvider,
     Map,} from '@vis.gl/react-google-maps';
 import { AdvancedMarker, Pin } from '@vis.gl/react-google-maps';
-import {useState } from 'react';
+import {useState, useRef } from 'react';
 
 
 // API key
@@ -40,18 +40,13 @@ async function getBusStopData(){
   }
 }
 
+
 function App() {
   const [busStops, setBusStops] = useState<BusStop[]>([])
   const [stopClicked, setStopClicked] = useState<boolean>(false)
   const [buses, setBuses] = useState<string[]>([])
   const [busLocation, setBusLocation] = useState<BusLocation[]>([])
-
-
-  // useEffect(()=> {
-  //     // Everytime we get new bus data, we re-render the page
-
-  // }, []) 
-  
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
   const handleClick = ( async ()=>{
     const result = await getBusStopData()
@@ -68,6 +63,7 @@ function App() {
 
   const handleBusClick = ( async (bus:string)=> {
     console.log(bus)
+    clearTimeout(timeoutRef.current) // Clear previous polling operation which used previously selected bus
     
     const url = 'http://127.0.0.1:5000/api/buses'
     try{
@@ -86,9 +82,16 @@ function App() {
       const data = await response.json()
       console.log(data)
       setBusLocation(data.buses)
+
+      timeoutRef.current = setTimeout(() => handleBusClick(bus), 10000) // Bus location updates every 10 seconds
     } catch (error) {
       console.log(error)
     }
+  })
+
+  const stopTracking = (() => {
+    console.log("Stopped bus tracking")
+    clearTimeout(timeoutRef.current)
   })
 
 
@@ -96,6 +99,9 @@ function App() {
     <div>
       <button onClick={handleClick}>
         Show bus stops
+      </button>
+      <button onClick={stopTracking}>
+        Stop Tracking
       </button>
 
     {stopClicked && <p>Buses that stop here: {buses.map((bus, index) => { return (
