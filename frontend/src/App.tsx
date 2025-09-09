@@ -13,14 +13,19 @@ const api_key = import.meta.env.VITE_API_KEY
 interface BusStop {
   location: google.maps.LatLngLiteral
   name: string;
-  buses: string[]
+  buses: BusObject
 }
 
 interface BusLocation {
   lat: number,
   lng: number
 }
-  
+
+interface BusObject {
+  arriva: string[]
+  stagecoach: string[]
+}
+
 
 // Fetch bus stop information
 async function getBusStopData(){
@@ -32,6 +37,8 @@ async function getBusStopData(){
       }
       const result = await response.json()
       const {bus_stops} = result
+      // console.log(bus_stops)
+      // console.log(result.bus_stops[2].buses.arriva)
       return bus_stops
   
   }catch (error){
@@ -44,19 +51,30 @@ async function getBusStopData(){
 function App() {
   const [busStops, setBusStops] = useState<BusStop[]>([])
   const [stopClicked, setStopClicked] = useState<boolean>(false)
-  const [buses, setBuses] = useState<string[]>([])
+  const [arrivaBuses, setArrivaBuses] = useState<string[]>([])
+  const [stageCoachBuses, setStageCoachBuses] = useState<string[]>([])
   const [busLocation, setBusLocation] = useState<BusLocation[]>([])
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
-  const handleClick = ( async ()=>{
+  const handleShowBusStopsClick = ( async ()=>{
     const result = await getBusStopData()
     setBusStops(result)
+    console.log(result)
+    console.log("hit", busStops)
   })
 
 
-  const handleStopClick = ((busList: string[])=>{
-    console.log(busList)
-    setBuses(busList)
+  const handleStopClick = ((busObject: BusObject)=>{
+    console.log(busObject) // TODO rename as its now an object not a list
+
+    const {arriva} = busObject
+    const {stagecoach} = busObject
+
+    console.log(arriva)
+    console.log(stagecoach)
+
+    setArrivaBuses(arriva)
+    setStageCoachBuses(stagecoach)
     setStopClicked(true)
   })
 
@@ -97,18 +115,25 @@ function App() {
 
   return (
     <div>
-      <button onClick={handleClick}>
+      <button onClick={handleShowBusStopsClick}>
         Show bus stops
       </button>
       <button onClick={stopTracking}>
         Stop Tracking
       </button>
 
-    {stopClicked && <p>Buses that stop here: {buses.map((bus, index) => { return (
+    {stopClicked && <p>Arriva: {arrivaBuses.map((bus, index) => { return (
       <span className='bus-name' 
       style={{cursor:'pointer'}}
       onClick={() => handleBusClick(bus)} 
       key={index}>"{bus}" 
+      </span>)
+    })} </p>}
+    {stopClicked && <p>Stagecoach: {stageCoachBuses.map((bus, index) => { return (
+      <span className='bus-name' 
+      style={{cursor:'pointer'}}
+      onClick={() => handleBusClick(bus)} 
+      key={index}>"{bus}"
       </span>)
     })} </p>}
     

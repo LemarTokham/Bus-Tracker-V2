@@ -1,7 +1,7 @@
 *.env
 
 # Large text file for bus location
-stagecoach_liverpool.txt
+backend/stagecoach_liverpool.txt
 
 # Test files
 test.py

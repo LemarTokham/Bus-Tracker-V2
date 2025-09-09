@@ -19,17 +19,20 @@ CORS(app)
 bus_stops = [
     {'name': 'Brownlow Hill',
      'id':'merdjapg',
-     'buses':["76", "201", "699"],
+     'buses':{"arriva": ["76", "201", "699"],
+              "stagecoach":[]},
      'location': {'lat': 53.40575, 'lng': -2.9618 } # [Lat, Long]
      },
      {'name': 'Crown Street',
      'id':'merdjapd',
-     'buses':["201", "6", "7", "79"],
+     'buses':{"arriva": ["201", "6", "7", "79"],
+              "stagecoach":[]},
      'location': {'lat': 53.40611, 'lng': -2.96367 }
      },
     {'name': 'Shaw Street',
      'id':'merdgwtp', # TODO: put in indicator field to distinguish between buses on same street
-     'buses':["14", "14A", "14B", "14X", "17", "17A", "17X", "19"], # TODO: Differentiate between arriva and stagecoach buses
+     'buses':{"arriva": [],
+              "stagecoach":["17", "17A", "17X", "19", "19X", "14", "14A", "14B", "14X"]}, # TODO: Differentiate between arriva and stagecoach buses
      'location': {'lat': 53.41204, 'lng': -2.96723}
      }
 ]
