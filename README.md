@@ -20,3 +20,4 @@ Building an improved bus tracker this time using react/ts and the google maps ap
 ![UI image](images/bus-location-image.png)
 
 # Current blockers
+- Having issues with polling unable to be stopped so once a request for a bus comes in it sort of goes on forever
