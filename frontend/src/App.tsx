@@ -79,7 +79,7 @@ function App() {
   })
 
 
-  const handleBusClick = ( async (bus:string)=> {
+  const handleBusClick = ( async (bus:string, company: string)=> {
     console.log(bus)
     clearTimeout(timeoutRef.current) // Clear previous polling operation which used previously selected bus
     
@@ -87,7 +87,11 @@ function App() {
     try{
       const response = await fetch(url, {
       method:'POST',
-      body: JSON.stringify(bus),
+      body: JSON.stringify({
+        busLine: bus,
+        busCompany: company
+      }
+        ),
       headers: {
         "Content-Type":"application/json"
       }
@@ -132,7 +136,7 @@ function App() {
     {stopClicked && <p>Stagecoach: {stageCoachBuses.map((bus, index) => { return (
       <span className='bus-name' 
       style={{cursor:'pointer'}}
-      onClick={() => handleBusClick(bus)} 
+      onClick={() => handleBusClick(bus, "stagecoach")} 
       key={index}>"{bus}"
       </span>)
     })} </p>}

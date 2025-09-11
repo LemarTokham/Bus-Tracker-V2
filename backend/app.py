@@ -39,10 +39,10 @@ bus_stops = [
 
 
 bus_info = []
-def fetch_data():
-    api_url = f"https://data.bus-data.dft.gov.uk/api/v1/datafeed/1695/?api_key={api_key}"
+def fetch_data(company_name, company_id):
+    api_url = f"https://data.bus-data.dft.gov.uk/api/v1/datafeed/{company_id}/?api_key={api_key}"
     response = requests.get(api_url)
-    with open("stagecoach_liverpool.txt", "w", encoding='utf-8') as f:
+    with open(f"{company_name}_liverpool.txt", "w", encoding='utf-8') as f:
         f.write(response.text) 
 
 
@@ -64,12 +64,21 @@ def get_bus_stops():
 
 @app.route('/api/buses', methods=['POST'])
 def send_bus_location():
-    fetch_data()
-    bus_line = request.json
+    bus_data = request.json
+
+    bus_line = bus_data["busLine"]
+    bus_company = bus_data["busCompany"]
+
+    if bus_company == "stagecoach":
+        company_id = 1695
+    elif bus_company == "arriva":
+        company_id = 709
+
+    fetch_data(bus_company, company_id)
     # XML structure example:
     # Siri -> ServiceDelivery -> VehicleMonitoringDelivery -> VehicleActivity (Where the data about individual buses live)
     # Parse through data and extract requested buses
-    tree = ET.parse('stagecoach_liverpool.txt')
+    tree = ET.parse(f'{bus_company}_liverpool.txt')
     ns = {'siri': "http://www.siri.org.uk/siri"}
     root = tree.getroot()
     allVehicles = root.findall('.//siri:VehicleActivity', ns)
