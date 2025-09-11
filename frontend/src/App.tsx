@@ -101,9 +101,16 @@ function App() {
       }
 
 
-      const data = await response.json()
-      console.log(data)
-      setBusLocation(data.buses)
+      const {buses} = await response.json()
+
+      // If theres no buses we don't need a tracking process so we end.
+      if (buses.length == 0){
+        alert("No buses operating, please try again later.")
+        return
+      }
+
+      console.log("Data", buses)
+      setBusLocation(buses)
 
       timeoutRef.current = setTimeout(() => handleBusClick(bus, company), 10000) // Bus location updates every 10 seconds
     } catch (error) {

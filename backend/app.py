@@ -20,7 +20,7 @@ bus_stops = [
      'id':'merdjapg',
      'buses':{"arriva": ["76", "201", "699"],
               "stagecoach":[]},
-     'location': {'lat': 53.40575, 'lng': -2.9618 } # [Lat, Long]
+     'location': {'lat': 53.40575, 'lng': -2.9618 }
      },
      {'name': 'Crown Street',
      'id':'merdjapd',
@@ -29,15 +29,15 @@ bus_stops = [
      'location': {'lat': 53.40611, 'lng': -2.96367 }
      },
     {'name': 'Shaw Street',
-     'id':'merdgwtp', # TODO: put in indicator field to distinguish between buses on same street
+     'id':'merdgwtp',
      'buses':{"arriva": [],
-              "stagecoach":["17", "17A", "17X", "19", "19X", "14", "14A", "14B", "14X"]}, # TODO: Differentiate between arriva and stagecoach buses
+              "stagecoach":["17", "17A", "17X", "19", "19X", "14", "14A", "14B", "14X"]},
      'location': {'lat': 53.41204, 'lng': -2.96723}
      },
      {'name': 'Liverpool One Bus Station',
      'id':'',
      'buses':{"arriva": ["X4","82A"],
-              "stagecoach":["82", "86", "86C", "10A", "86A"]}, # TODO: Differentiate between arriva and stagecoach buses
+              "stagecoach":["82", "86", "86C", "10A", "86A"]},
      'location': {'lat': 53.40187, 'lng': -2.98796}
      }
 ]
@@ -80,6 +80,7 @@ def send_bus_location():
         company_id = 709
 
     fetch_data(bus_company, company_id)
+    
     # XML structure example:
     # Siri -> ServiceDelivery -> VehicleMonitoringDelivery -> VehicleActivity (Where the data about individual buses live)
     # Parse through data and extract requested buses
@@ -87,7 +88,7 @@ def send_bus_location():
     ns = {'siri': "http://www.siri.org.uk/siri"}
     root = tree.getroot()
     allVehicles = root.findall('.//siri:VehicleActivity', ns)
-    # Clear list before populating with new buses
+
     bus_info = []
     for vehicle in allVehicles:
         journey = vehicle.find('./siri:MonitoredVehicleJourney', ns)
