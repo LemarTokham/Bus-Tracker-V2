@@ -105,7 +105,7 @@ function App() {
       console.log(data)
       setBusLocation(data.buses)
 
-      timeoutRef.current = setTimeout(() => handleBusClick(bus), 10000) // Bus location updates every 10 seconds
+      timeoutRef.current = setTimeout(() => handleBusClick(bus, company), 10000) // Bus location updates every 10 seconds
     } catch (error) {
       console.log(error)
     }
@@ -129,7 +129,7 @@ function App() {
     {stopClicked && <p>Arriva: {arrivaBuses.map((bus, index) => { return (
       <span className='bus-name' 
       style={{cursor:'pointer'}}
-      onClick={() => handleBusClick(bus)} 
+      onClick={() => handleBusClick(bus, "arriva")} 
       key={index}>"{bus}" 
       </span>)
     })} </p>}

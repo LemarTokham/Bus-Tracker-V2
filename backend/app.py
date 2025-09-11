@@ -8,7 +8,6 @@ import json
 import xml.etree.ElementTree as ET
 import time
 
-
 load_dotenv()
 api_key = os.getenv('API_KEY')
 
@@ -94,7 +93,6 @@ def send_bus_location():
                     lat = location.find('./siri:Latitude', ns)
                     long = location.find('./siri:Longitude', ns)
                     bus_info.append({'lat':float(lat.text), 'lng':float(long.text)})
-    print(f"Recived {bus_line}")
 
     return jsonify({
         "message": "Got the bus",
