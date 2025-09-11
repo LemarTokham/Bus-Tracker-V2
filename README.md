@@ -6,6 +6,7 @@ Building an improved bus tracker this time using react/ts and the google maps ap
 - Each stop can be clicked on, showing the buses from the selected stop and from the relevant company (arriva/ stagecoach)
 - Each bus can be clicked on, once clicked, the location of each bus of that line is displayed on the map
 - Polling of API happens every 10 seconds to get new location data automatically
+- Shows relevant buses from both arriva and stagecoach
 
 # Features in progress
 - Letting the user know which of the bus options have no buses out on the roads
@@ -20,4 +21,3 @@ Building an improved bus tracker this time using react/ts and the google maps ap
 ![UI image](images/bus-location-image.png)
 
 # Current blockers
-- Having issues with polling unable to be stopped so once a request for a bus comes in it sort of goes on forever

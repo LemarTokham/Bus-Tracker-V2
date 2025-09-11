@@ -118,7 +118,7 @@ function App() {
 
 
   return (
-    <div>
+    <div className='app-container'>
       <button onClick={handleShowBusStopsClick}>
         Show bus stops
       </button>
@@ -143,7 +143,6 @@ function App() {
     
     <APIProvider apiKey={api_key}>
       <Map
-       style={{width: 800, height: 800} }
       defaultCenter={{ lat: 53.400002, lng:-2.983333 }}
       defaultZoom={13}
       mapId={'bdf9633d0aa1b62af7a1a582'}

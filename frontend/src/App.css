@@ -1,3 +1,13 @@
 .bus-name:hover{
     color: rgb(47, 118, 233);
 }
+
+#root {
+    height: 100%;
+    width: 100%;
+}
+
+.app-container {
+    width: 100vw;
+    height: 100vw;
+}

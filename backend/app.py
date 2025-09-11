@@ -33,6 +33,12 @@ bus_stops = [
      'buses':{"arriva": [],
               "stagecoach":["17", "17A", "17X", "19", "19X", "14", "14A", "14B", "14X"]}, # TODO: Differentiate between arriva and stagecoach buses
      'location': {'lat': 53.41204, 'lng': -2.96723}
+     },
+     {'name': 'Liverpool One Bus Station',
+     'id':'',
+     'buses':{"arriva": ["X4","82A"],
+              "stagecoach":["82", "86", "86C", "10A", "86A"]}, # TODO: Differentiate between arriva and stagecoach buses
+     'location': {'lat': 53.40187, 'lng': -2.98796}
      }
 ]
 
