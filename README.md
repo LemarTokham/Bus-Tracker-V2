@@ -16,7 +16,7 @@ Building an improved bus tracker this time using react/ts and the google maps ap
 
 # Image of UI + console
 - Yellow pins are the bus stops
-- Red pins are the busses from selected bus (the "17" highlighted in blue)
+- Red pins are the busses from selected bus (the "10A" highlighted in blue)
 ![UI image](images/map-image.png)
 
 # Current blockers
