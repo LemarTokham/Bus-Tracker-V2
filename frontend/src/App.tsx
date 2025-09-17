@@ -4,6 +4,7 @@ import {
     Map,} from '@vis.gl/react-google-maps';
 import { AdvancedMarker, Pin } from '@vis.gl/react-google-maps';
 import {useState, useRef } from 'react';
+import Button from './components/Button';
 
 
 // API key
@@ -126,12 +127,14 @@ function App() {
 
   return (
     <div className='app-container'>
-      <button onClick={handleShowBusStopsClick}>
-        Show bus stops
-      </button>
-      <button onClick={stopTracking}>
-        Stop Tracking
-      </button>
+      <Button
+        text="Show bus stops"
+        onClick={handleShowBusStopsClick}
+      />
+      <Button
+        text="Stop Tracking"
+        onClick={stopTracking}
+      />
 
     {stopClicked && <p>Arriva: {arrivaBuses.map((bus, index) => { return (
       <span className='bus-name' 
@@ -140,6 +143,7 @@ function App() {
       key={index}>"{bus}" 
       </span>)
     })} </p>}
+
     {stopClicked && <p>Stagecoach: {stageCoachBuses.map((bus, index) => { return (
       <span className='bus-name' 
       style={{cursor:'pointer'}}
@@ -147,6 +151,7 @@ function App() {
       key={index}>"{bus}"
       </span>)
     })} </p>}
+    
     
     <APIProvider apiKey={api_key}>
       <Map
