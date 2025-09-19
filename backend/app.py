@@ -7,40 +7,63 @@ from dotenv import load_dotenv
 import json
 import xml.etree.ElementTree as ET
 import time
+import pandas as pd
 
+
+# Setup
 load_dotenv()
 api_key = os.getenv('API_KEY')
-
 app = Flask(__name__)
 CORS(app)
 
+# Creating Dataframe
+df = pd.read_csv('StopsInfo.csv')
+liverpool_active_df = df[(df["LocalityName"] == "Liverpool") & (df["Status"] == "active")]
+updated_df = liverpool_active_df[["NaptanCode","CommonName","Street","Indicator", "LocalityName", "Longitude", "Latitude"]]
 
-bus_stops = [
-    {'name': 'Brownlow Hill',
+# Adding Buses
+updated_df["Arriva"] = "default"
+updated_df["Stagecoach"] = "default"
+
+
+stops_with_buses = [
+    {
      'id':'merdjapg',
      'buses':{"arriva": ["76", "201", "699"],
               "stagecoach":[]},
-     'location': {'lat': 53.40575, 'lng': -2.9618 }
      },
-     {'name': 'Crown Street',
+     {
      'id':'merdjapd',
      'buses':{"arriva": ["201", "6", "7", "79"],
               "stagecoach":[]},
-     'location': {'lat': 53.40611, 'lng': -2.96367 }
      },
-    {'name': 'Shaw Street',
+    {
      'id':'merdgwtp',
      'buses':{"arriva": [],
               "stagecoach":["17", "17A", "17X", "19", "19X", "14", "14A", "14B", "14X"]},
-     'location': {'lat': 53.41204, 'lng': -2.96723}
      },
-     {'name': 'Liverpool One Bus Station',
-     'id':'',
-     'buses':{"arriva": ["X4","82A"],
-              "stagecoach":["82", "86", "86C", "10A", "86A"]},
-     'location': {'lat': 53.40187, 'lng': -2.98796}
-     }
 ]
+
+
+def add_stops_to_df():
+    # Will add a list of buses to a give stop ID
+    for index, row in updated_df.iterrows():
+        stop_id = row['NaptanCode']
+        for stop in stops_with_buses:
+            if stop['id'] == stop_id:
+                updated_df.at[index, "Arriva"] = stop["buses"]["arriva"]
+                updated_df.at[index, "Stagecoach"] = stop["buses"]["stagecoach"]
+add_stops_to_df()
+
+
+# Creating a dataframe consisting of only stops that have buses assigned to them
+complete_df = updated_df[(updated_df["Arriva"] != "default") & (updated_df["Stagecoach"] != "default")] 
+
+
+@app.route('/api/bus-stops', methods=['GET'])
+def get_bus_stops():
+    bus_stop_data = complete_df.to_json(orient="records")
+    return bus_stop_data
 
 
 bus_info = []
@@ -60,13 +83,6 @@ def home():
     })
 
 
-@app.route('/api/bus-stops', methods=['GET'])
-def get_bus_stops():
-    return jsonify({
-        "bus_stops":bus_stops
-    })
-
-
 @app.route('/api/buses', methods=['POST'])
 def send_bus_location():
     bus_data = request.json
@@ -80,7 +96,7 @@ def send_bus_location():
         company_id = 709
 
     fetch_data(bus_company, company_id)
-    
+
     # XML structure example:
     # Siri -> ServiceDelivery -> VehicleMonitoringDelivery -> VehicleActivity (Where the data about individual buses live)
     # Parse through data and extract requested buses

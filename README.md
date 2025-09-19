@@ -9,10 +9,10 @@ Building an improved bus tracker this time using react/ts and the google maps ap
 - Polling of API happens every 10 seconds to get new location data automatically
 
 # Features in progress
+- CODE REFACTORING IN PROGRESS: switching to using a Pandas Dataframe to store bus stop information 
 - Legend for icons
 - Showing buses incoming to the bus stop
 - Only showing buses within the Liverpool region as sometimes buses with the same service number in other cities are displayed
-- General code cleanup
 - Someway to show the uer the 10 second tracking timer for bus location update (maybe a spinner?)
 
 # Image of UI + console
@@ -21,3 +21,4 @@ Building an improved bus tracker this time using react/ts and the google maps ap
 ![UI image](images/map-image.png)
 
 # Current blockers
+- Code refactoring
