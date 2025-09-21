@@ -19,11 +19,31 @@ CORS(app)
 # Creating Dataframe
 df = pd.read_csv('StopsInfo.csv')
 liverpool_active_df = df[(df["LocalityName"] == "Liverpool") & (df["Status"] == "active")]
-updated_df = liverpool_active_df[["NaptanCode","CommonName","Street","Indicator", "LocalityName", "Longitude", "Latitude"]]
+location_df = liverpool_active_df[["Latitude", "Longitude"]]
 
-# Adding Buses
+# Combining longitude and Latitude into a single array for easier processing
+location_data = []
+for index,row in location_df.iterrows():
+    try:
+        location_data.append({'lat': float(row['Latitude']), 'lng': float(row['Longitude'])})
+    except ValueError as e:
+        location_data.append({'lat': 0, 'lng': 0}) # Deals with invalid locations
+
+updated_df = liverpool_active_df[["NaptanCode","CommonName","Street","Indicator", "LocalityName"]]
+# Adding columns
 updated_df["Arriva"] = "default"
 updated_df["Stagecoach"] = "default"
+updated_df['Location'] = "default"
+
+def add_location():
+    count = 0
+    for index, row in updated_df.iterrows():
+        updated_df.at[index, 'Location'] = location_data[count]
+        count+=1
+
+add_location()
+print(updated_df)
+
 
 
 stops_with_buses = [
@@ -53,6 +73,7 @@ def add_stops_to_df():
             if stop['id'] == stop_id:
                 updated_df.at[index, "Arriva"] = stop["buses"]["arriva"]
                 updated_df.at[index, "Stagecoach"] = stop["buses"]["stagecoach"]
+                
 add_stops_to_df()
 
 

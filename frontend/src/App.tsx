@@ -11,20 +11,26 @@ import Button from './components/Button';
 const api_key = import.meta.env.VITE_API_KEY
 
 
+// interface BusStop {
+//   location: google.maps.LatLngLiteral
+//   name: string;
+//   buses: BusObject
+// }
+
 interface BusStop {
-  location: google.maps.LatLngLiteral
-  name: string;
-  buses: BusObject
+  Arriva: []
+  CommonName: string
+  Indicator: string
+  LocalityName: string
+  Location: google.maps.LatLngLiteral
+  NaptanCode: string
+  Stagecoach: []
+  Street: string
 }
 
 interface BusLocation {
   lat: number,
   lng: number
-}
-
-interface BusObject {
-  arriva: string[]
-  stagecoach: string[]
 }
 
 
@@ -37,10 +43,7 @@ async function getBusStopData(){
         throw new Error(`Response status: ${response.status}`);
       }
       const result = await response.json()
-      const {bus_stops} = result
-      // console.log(bus_stops)
-      // console.log(result.bus_stops[2].buses.arriva)
-      return bus_stops
+      return result
   
   }catch (error){
     console.log(error)
@@ -65,17 +68,11 @@ function App() {
   })
 
 
-  const handleStopClick = ((busObject: BusObject)=>{
-    console.log(busObject) // TODO rename as its now an object not a list
-
-    const {arriva} = busObject
-    const {stagecoach} = busObject
-
-    console.log(arriva)
-    console.log(stagecoach)
-
-    setArrivaBuses(arriva)
-    setStageCoachBuses(stagecoach)
+  const handleStopClick = ((arrivaBuses: string[], stagecoachBuses: string[] )=>{
+    console.log(arrivaBuses) // TODO rename as its now an object not a list
+    console.log(stagecoachBuses)
+    setArrivaBuses(arrivaBuses)
+    setStageCoachBuses(stagecoachBuses)
     setStopClicked(true)
   })
 
@@ -162,9 +159,9 @@ function App() {
       >
       {busStops.map((stop)=>(
         <AdvancedMarker
-        onClick={() => handleStopClick(stop.buses)}
-        key={stop.name}
-        position={stop.location}
+        onClick={() => handleStopClick(stop.Arriva, stop.Stagecoach)}
+        key={stop.NaptanCode}
+        position={stop.Location}
         >
           <Pin background={'#FBBC04'} glyphColor={'#000'} borderColor={'#000'} />
         </AdvancedMarker>
