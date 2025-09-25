@@ -15,13 +15,24 @@ load_dotenv()
 api_key = os.getenv('API_KEY')
 app = Flask(__name__)
 CORS(app)
+COMPANY_IDS = {
+    "stagecoach": 1695,
+    "arriva": 709
+}
+
+# In-memory cache
+last_bus_data = {} # Dicts for different bus companies
+last_fetch_time = {}
+
 
 # Creating Dataframe
 df = pd.read_csv('StopsInfo.csv')
+
+# Only want active stops within liverpool
 liverpool_active_df = df[(df["LocalityName"] == "Liverpool") & (df["Status"] == "active")]
-location_df = liverpool_active_df[["Latitude", "Longitude"]]
 
 # Combining longitude and Latitude into a single array for easier processing
+location_df = liverpool_active_df[["Latitude", "Longitude"]]
 location_data = []
 for index,row in location_df.iterrows():
     try:
@@ -29,11 +40,14 @@ for index,row in location_df.iterrows():
     except ValueError as e:
         location_data.append({'lat': 0, 'lng': 0}) # Deals with invalid locations
 
+# Filtering to include only the columns we want
 updated_df = liverpool_active_df[["NaptanCode","CommonName","Street","Indicator", "LocalityName"]]
+
 # Adding columns
 updated_df["Arriva"] = "default"
 updated_df["Stagecoach"] = "default"
 updated_df['Location'] = "default"
+
 
 def add_location():
     count = 0
@@ -41,11 +55,18 @@ def add_location():
         updated_df.at[index, 'Location'] = location_data[count]
         count+=1
 
-add_location()
-print(updated_df)
+def add_stops_to_df():
+    # Will add a list of buses to a give stop ID
+    for index, row in updated_df.iterrows():
+        stop_id = row['NaptanCode']
+        for stop in stops_with_buses:
+            if stop['id'] == stop_id:
+                updated_df.at[index, "Arriva"] = stop["buses"]["arriva"]
+                updated_df.at[index, "Stagecoach"] = stop["buses"]["stagecoach"]
 
 
 
+# When adding a new bus stop with buses, it needs to be added here so the program can add it to the dataframe
 stops_with_buses = [
     {
      'id':'merdjapg',
@@ -64,35 +85,45 @@ stops_with_buses = [
      },
 ]
 
-
-def add_stops_to_df():
-    # Will add a list of buses to a give stop ID
-    for index, row in updated_df.iterrows():
-        stop_id = row['NaptanCode']
-        for stop in stops_with_buses:
-            if stop['id'] == stop_id:
-                updated_df.at[index, "Arriva"] = stop["buses"]["arriva"]
-                updated_df.at[index, "Stagecoach"] = stop["buses"]["stagecoach"]
-                
+# Running functions to build bus location dataframe 
+add_location()           
 add_stops_to_df()
 
-
-# Creating a dataframe consisting of only stops that have buses assigned to them
+# Creating a dataframe consisting of only stops that have buses assigned to them as those are the only ones the client needs
 complete_df = updated_df[(updated_df["Arriva"] != "default") & (updated_df["Stagecoach"] != "default")] 
-
-
-@app.route('/api/bus-stops', methods=['GET'])
-def get_bus_stops():
-    bus_stop_data = complete_df.to_json(orient="records")
-    return bus_stop_data
 
 
 bus_info = []
 def fetch_data(company_name, company_id):
     api_url = f"https://data.bus-data.dft.gov.uk/api/v1/datafeed/{company_id}/?api_key={api_key}"
-    response = requests.get(api_url)
-    with open(f"{company_name}_liverpool.txt", "w", encoding='utf-8') as f:
-        f.write(response.text) 
+    try:
+        response = requests.get(api_url)
+        response.raise_for_status()
+        return ET.ElementTree(ET.fromstring(response.text)) # Returns a ready-to-use tree
+    except requests.RequestException as e:
+        return None
+    
+
+def fetch_data_cached(company_name, company_id, ttl=10):
+    now = time.time()
+
+    # If we already have recently fetched data for a company, return cached data
+    if company_name in last_bus_data and (now - last_fetch_time[company_name]) < ttl:
+        return last_bus_data[company_name]
+    
+    # else get new data
+    tree = fetch_data(company_name, company_id)
+    if tree:
+        last_bus_data[company_name] = tree
+        last_fetch_time[company_name] = now
+    return tree
+
+
+# Endpoints
+@app.route('/api/bus-stops', methods=['GET'])
+def get_bus_stops():
+    bus_stop_data = complete_df.to_json(orient="records")
+    return bus_stop_data
 
 
 @app.route('/', methods=['GET'])
@@ -111,17 +142,15 @@ def send_bus_location():
     bus_line = bus_data["busLine"]
     bus_company = bus_data["busCompany"]
 
-    if bus_company == "stagecoach":
-        company_id = 1695
-    elif bus_company == "arriva":
-        company_id = 709
+    company_id = COMPANY_IDS.get(bus_company)
+    if not company_id:
+        return jsonify({"message": "Invalid bus company"}), 400 # Bad Request
+    
 
-    fetch_data(bus_company, company_id)
-
-    # XML structure example:
-    # Siri -> ServiceDelivery -> VehicleMonitoringDelivery -> VehicleActivity (Where the data about individual buses live)
-    # Parse through data and extract requested buses
-    tree = ET.parse(f'{bus_company}_liverpool.txt')
+    tree = fetch_data_cached(bus_company, company_id)
+    if tree is None:
+        return jsonify({"message": "Failed to fetch"}), 502 # Bad Gateway
+    
     ns = {'siri': "http://www.siri.org.uk/siri"}
     root = tree.getroot()
     allVehicles = root.findall('.//siri:VehicleActivity', ns)
@@ -135,8 +164,8 @@ def send_bus_location():
                 location = journey.find('./siri:VehicleLocation', ns)
                 if location is not None : # Checking if we have a location
                     lat = location.find('./siri:Latitude', ns)
-                    long = location.find('./siri:Longitude', ns)
-                    bus_info.append({'lat':float(lat.text), 'lng':float(long.text)})
+                    lng = location.find('./siri:Longitude', ns)
+                    bus_info.append({'lat':float(lat.text), 'lng':float(lng.text)})
 
     return jsonify({
         "message": "Got the bus",
