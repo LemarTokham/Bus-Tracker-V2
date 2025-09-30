@@ -1,4 +1,4 @@
-# Bus Tracker V2
+# Bus Tracker V2 (Currently on pause due to poor government API performance! )
 Building an improved bus tracker this time using react/ts and the google maps api
 
 # Current Features
@@ -29,3 +29,8 @@ Building an improved bus tracker this time using react/ts and the google maps ap
 # Current blockers
 - Code cleaning (IT LOOKS HORRIBLE TRUST THE PROCESS i just needed it to work after the migration to pandas)
 
+# Journal
+- Removed writing and reading to file so we just read right away from response rather than waste disk space
+- Learnt about try and except for handling HTTPErrors
+- Converted to use PD dataframes
+- Caching so we reduce the number of API calls we make, if a call is made within 10 seconds of getting data for the same company, we use the cached data, else, we fetch new location data. This is because location data updates every 10 seconds and calls inbetween this time won't have many changes

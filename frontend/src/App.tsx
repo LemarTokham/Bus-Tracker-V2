@@ -2,20 +2,15 @@ import './App.css'
 import {
     APIProvider,
     Map,} from '@vis.gl/react-google-maps';
-import { AdvancedMarker, Pin } from '@vis.gl/react-google-maps';
+import { AdvancedMarker, Pin} from '@vis.gl/react-google-maps';
 import {useState, useRef } from 'react';
 import Button from './components/Button';
+import BusLineSelector from './components/BusLineSelector';
+
 
 
 // API key
 const api_key = import.meta.env.VITE_API_KEY
-
-
-// interface BusStop {
-//   location: google.maps.LatLngLiteral
-//   name: string;
-//   buses: BusObject
-// }
 
 interface BusStop {
   Arriva: []
@@ -32,6 +27,11 @@ interface BusLocation {
   lat: number,
   lng: number
 }
+
+
+// Route line idea
+// for every bus location that changes, draw a line, let it run for 24 hours and hopefully some line shouldve been followed
+
 
 
 // Fetch bus stop information
@@ -59,6 +59,7 @@ function App() {
   const [stageCoachBuses, setStageCoachBuses] = useState<string[]>([])
   const [busLocation, setBusLocation] = useState<BusLocation[]>([])
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
+
 
   const handleShowBusStopsClick = ( async ()=>{
     const result = await getBusStopData()
@@ -98,7 +99,6 @@ function App() {
         throw new Error(`Response status: ${response.status}`);
       }
 
-
       const {buses} = await response.json()
 
       // If theres no buses we don't need a tracking process so we end.
@@ -115,6 +115,7 @@ function App() {
       console.log(error)
     }
   })
+
 
   const stopTracking = (() => {
     console.log("Stopped bus tracking")
@@ -133,21 +134,13 @@ function App() {
         onClick={stopTracking}
       />
 
-    {stopClicked && <p>Arriva: {arrivaBuses.map((bus, index) => { return (
-      <span className='bus-name' 
-      style={{cursor:'pointer'}}
-      onClick={() => handleBusClick(bus, "arriva")} 
-      key={index}>"{bus}" 
-      </span>)
-    })} </p>}
 
-    {stopClicked && <p>Stagecoach: {stageCoachBuses.map((bus, index) => { return (
-      <span className='bus-name' 
-      style={{cursor:'pointer'}}
-      onClick={() => handleBusClick(bus, "stagecoach")} 
-      key={index}>"{bus}"
-      </span>)
-    })} </p>}
+    {stopClicked && (
+      <BusLineSelector
+      arrivaLines={arrivaBuses}
+      stageCoachLines={stageCoachBuses}
+      onBusClick={handleBusClick}/>
+    )}
     
     
     <APIProvider apiKey={api_key}>
@@ -182,5 +175,5 @@ function App() {
     </div>
   )
 }
-
+// TODO separate into components
 export default App
